@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pencil Sketch Creator — Photo to Sketch Studio</title>
+<meta name="description" content="Turn any photo into a hand-drawn pencil sketch, free — no login, no upload, everything happens on your device.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f2ead7;
+    --paper-deep:#e6d9bd;
+    --graphite-900:#241f1c;
+    --graphite-700:#453e37;
+    --graphite-500:#6b6058;
+    --graphite-300:#a89d8e;
+    --wood:#b6863f;
+    --wood-dark:#8a621f;
+    --eraser:#c98374;
+    --line:#d8c9a3;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(69,62,55,0.06) 1px, transparent 0);
+    background-size: 22px 22px;
+    color:var(--graphite-900);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .en{font-family:'Inter',sans-serif;}
+  .wrap{max-width:760px; margin:0 auto; padding:22px 18px 60px;}
+
+  /* ---------- header ---------- */
+  header{text-align:center; margin-bottom:22px;}
+  .brand{
+    font-family:'Inter',sans-serif; direction:ltr;
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--wood-dark); font-weight:600; opacity:.8;
+  }
+  h1{
+    font-family:'Kalam',cursive;
+    font-size:44px; line-height:1.15; margin:8px 0 6px;
+    color:var(--graphite-900);
+  }
+  .underline{
+    width:150px; height:10px; margin:0 auto 14px;
+  }
+  .sub{
+    font-size:16px; color:var(--graphite-700); max-width:520px; margin:0 auto;
+  }
+
+  /* ---------- upload zone ---------- */
+  .dropzone{
+    margin-top:26px;
+    border:2.5px dashed var(--graphite-300);
+    border-radius:14px;
+    background:rgba(255,255,255,0.35);
+    padding:34px 18px;
+    text-align:center;
+    cursor:pointer;
+    transition:.15s border-color, .15s background;
+    position:relative;
+  }
+  .dropzone.drag{border-color:var(--wood); background:rgba(182,134,63,0.12);}
+  .dropzone svg{width:46px; height:46px; opacity:.55; margin-bottom:10px;}
+  .dropzone .cta{font-size:17px; font-weight:700;}
+  .dropzone .hint{font-size:13px; color:var(--graphite-500); margin-top:6px;}
+  input[type=file]{display:none;}
+
+  /* ---------- workspace ---------- */
+  #workspace{display:none; margin-top:26px;}
+  #workspace.active{display:block;}
+
+  .compare{
+    position:relative;
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    box-shadow:0 10px 26px rgba(36,31,28,0.14);
+    background:#000;
+    touch-action:none;
+    user-select:none;
+  }
+  .compare img, .compare canvas{
+    display:block; width:100%; height:auto;
+  }
+  .layer-after{
+    position:absolute; top:0; left:0; height:100%; overflow:hidden;
+  }
+  .layer-after canvas{height:100%; width:auto; max-width:none;}
+  .handle{
+    position:absolute; top:0; bottom:0; width:0;
+    border-right:2px solid #fff;
+    filter:drop-shadow(0 0 3px rgba(0,0,0,.5));
+    pointer-events:none;
+  }
+  .handle::after{
+    content:"✏️";
+    position:absolute; top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    width:38px; height:38px; border-radius:50%;
+    background:#fff; display:flex; align-items:center; justify-content:center;
+    font-size:17px;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+  }
+  .tag{
+    position:absolute; top:8px; font-size:11px; font-weight:700;
+    background:rgba(36,31,28,.72); color:#fff; padding:3px 9px; border-radius:20px;
+    font-family:'Inter',sans-serif; letter-spacing:.05em; direction:ltr;
+  }
+  .tag.before{right:8px;}
+  .tag.after{left:8px;}
+
+  /* ---------- controls ---------- */
+  .toolbox{
+    margin-top:22px;
+    background:#fffdf8;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px 18px 8px;
+    box-shadow:0 4px 14px rgba(36,31,28,.06);
+  }
+  .toolbox-title{
+    font-family:'Kalam',cursive; font-size:20px; margin:0 0 14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .toolbox-title .pencil-dot{width:10px;height:10px;border-radius:50%;background:var(--wood);}
+
+  .slider-row{margin-bottom:16px;}
+  .slider-row label{
+    display:flex; justify-content:space-between; font-size:14px; font-weight:600;
+    margin-bottom:6px; color:var(--graphite-700);
+  }
+  .slider-row .val{font-family:'Inter',sans-serif; color:var(--wood-dark); direction:ltr;}
+  input[type=range]{
+    -webkit-appearance:none; width:100%; height:6px; border-radius:4px;
+    background:var(--paper-deep); outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:20px; height:20px; border-radius:50%;
+    background:var(--wood); border:3px solid #fffdf8; box-shadow:0 1px 4px rgba(0,0,0,.3);
+    cursor:pointer; margin-top:0;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:20px; height:20px; border-radius:50%;
+    background:var(--wood); border:3px solid #fffdf8; box-shadow:0 1px 4px rgba(0,0,0,.3);
+    cursor:pointer;
+  }
+
+  .mode-row{display:flex; gap:8px; margin-bottom:18px;}
+  .mode-btn{
+    flex:1; padding:10px 6px; border-radius:10px; border:1.5px solid var(--line);
+    background:#fff; font-family:'Inter',sans-serif; font-size:14px;
+    cursor:pointer; text-align:center; transition:.15s;
+  }
+  .mode-btn.active{border-color:var(--wood); background:rgba(182,134,63,.12); font-weight:700;}
+
+  .actions{display:flex; gap:10px; margin-top:6px; padding-bottom:16px;}
+  button.primary, button.secondary{
+    flex:1; padding:14px 10px; border-radius:11px; border:none;
+    font-size:16px; font-weight:700; cursor:pointer;
+    font-family:'Inter',sans-serif;
+    transition:.15s transform;
+  }
+  button.primary{background:var(--wood); color:#fff;}
+  button.primary:active{transform:scale(.97);}
+  button.secondary{background:transparent; color:var(--graphite-700); border:1.5px solid var(--line);}
+  button.secondary:active{transform:scale(.97);}
+
+  .processing-note{
+    text-align:center; font-size:12.5px; color:var(--graphite-500); margin-top:14px;
+  }
+
+  footer{
+    text-align:center; margin-top:36px; font-size:12.5px; color:var(--graphite-500);
+    padding-top:18px; border-top:1px dashed var(--line);
+  }
+  footer .en{color:var(--graphite-500);}
+
+  canvas.hidden-canvas{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand en">AI Naqshify Studio</div>
+    <h1>Pencil Sketch Creator</h1>
+    <svg class="underline" viewBox="0 0 150 10"><path d="M2,7 Q40,2 75,6 T148,4" stroke="#b6863f" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+    <p class="sub">Pick any photo and watch it turn into a hand-drawn pencil sketch. Nothing is uploaded — every bit of processing happens right here on your device.</p>
+  </header>
+
+  <div class="dropzone" id="dropzone">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+    <div class="cta">Drop a photo here, or tap to choose one</div>
+    <div class="hint en">JPG / PNG — processed 100% on your device</div>
+    <input type="file" id="fileInput" accept="image/*">
+  </div>
+
+  <div id="workspace">
+    <div class="compare" id="compareBox">
+      <img id="beforeImg" alt="before">
+      <div class="layer-after" id="afterLayer">
+        <canvas id="sketchCanvas"></canvas>
+      </div>
+      <div class="handle" id="handle"></div>
+      <span class="tag before en">ORIGINAL</span>
+      <span class="tag after en">SKETCH</span>
+    </div>
+
+    <div class="toolbox">
+      <div class="toolbox-title"><span class="pencil-dot"></span> Sketch settings</div>
+
+      <div class="mode-row" id="modeRow">
+        <div class="mode-btn active" data-mode="pencil">✏️ Graphite</div>
+        <div class="mode-btn" data-mode="ink">🖊️ Fine Line</div>
+        <div class="mode-btn" data-mode="charcoal">🖤 Charcoal</div>
+      </div>
+
+      <div class="slider-row">
+        <label>Detail <span class="val" id="valBlur">7</span></label>
+        <input type="range" id="rangeBlur" min="1" max="25" value="7">
+      </div>
+      <div class="slider-row">
+        <label>Shading intensity <span class="val" id="valIntensity">50</span></label>
+        <input type="range" id="rangeIntensity" min="0" max="100" value="50">
+      </div>
+      <div class="slider-row">
+        <label>Paper grain <span class="val" id="valGrain">18</span></label>
+        <input type="range" id="rangeGrain" min="0" max="60" value="18">
+      </div>
+
+      <div class="actions">
+        <button class="secondary" id="btnNew">New photo</button>
+        <button class="primary" id="btnDownload">⬇ Download</button>
+      </div>
+      <div class="processing-note" id="statusNote"></div>
+    </div>
+  </div>
+
+  <footer>
+    Your photo never touches the internet — every step of the sketching happens locally in your browser.<br>
+    <span class="en">Made with ✏️ · AI Naqshify Studio</span>
+  </footer>
+</div>
+
+<canvas id="workCanvas" class="hidden-canvas"></canvas>
+
+<script>
+(function(){
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const workspace = document.getElementById('workspace');
+  const beforeImg = document.getElementById('beforeImg');
+  const sketchCanvas = document.getElementById('sketchCanvas');
+  const afterLayer = document.getElementById('afterLayer');
+  const compareBox = document.getElementById('compareBox');
+  const handle = document.getElementById('handle');
+  const workCanvas = document.getElementById('workCanvas');
+  const statusNote = document.getElementById('statusNote');
+
+  const rangeBlur = document.getElementById('rangeBlur');
+  const rangeIntensity = document.getElementById('rangeIntensity');
+  const rangeGrain = document.getElementById('rangeGrain');
+  const valBlur = document.getElementById('valBlur');
+  const valIntensity = document.getElementById('valIntensity');
+  const valGrain = document.getElementById('valGrain');
+  const modeRow = document.getElementById('modeRow');
+
+  let currentMode = 'pencil';
+  let baseGray = null;   // Uint8ClampedArray, grayscale source
+  let imgW = 0, imgH = 0;
+  let noiseTile = null;
+  let debounceTimer = null;
+
+  const MAX_DIM = 900; // processing resolution cap for phone performance
+
+  // ---------- upload handling ----------
+  dropzone.addEventListener('click', () => fileInput.click());
+  ['dragover','dragenter'].forEach(ev=>{
+    dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.classList.add('drag'); });
+  });
+  ['dragleave','drop'].forEach(ev=>{
+    dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.classList.remove('drag'); });
+  });
+  dropzone.addEventListener('drop', e=>{
+    const f = e.dataTransfer.files[0];
+    if(f) handleFile(f);
+  });
+  fileInput.addEventListener('change', e=>{
+    const f = e.target.files[0];
+    if(f) handleFile(f);
+  });
+
+  document.getElementById('btnNew').addEventListener('click', ()=>{
+    workspace.classList.remove('active');
+    fileInput.value = '';
+    dropzone.style.display = 'block';
+  });
+
+  document.getElementById('btnDownload').addEventListener('click', downloadResult);
+
+  function handleFile(file){
+    if(!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => loadImage(e.target.result);
+    reader.readAsDataURL(file);
+  }
+
+  function loadImage(dataUrl){
+    const img = new Image();
+    img.onload = () => {
+      let w = img.naturalWidth, h = img.naturalHeight;
+      const scale = Math.min(1, MAX_DIM / Math.max(w,h));
+      w = Math.round(w*scale); h = Math.round(h*scale);
+      imgW = w; imgH = h;
+
+      workCanvas.width = w; workCanvas.height = h;
+      const ctx = workCanvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const imageData = ctx.getImageData(0,0,w,h);
+      baseGray = toGrayscale(imageData);
+
+      // set before image to the resized version for a matching frame
+      beforeImg.src = workCanvas.toDataURL('image/jpeg', 0.92);
+
+      sketchCanvas.width = w; sketchCanvas.height = h;
+
+      dropzone.style.display = 'none';
+      workspace.classList.add('active');
+
+      beforeImg.onload = () => {
+        // sync sizes once the before image has rendered
+        render();
+        resetHandle();
+      };
+      if(beforeImg.complete) { render(); resetHandle(); }
+    };
+    img.src = dataUrl;
+  }
+
+  function toGrayscale(imageData){
+    const {data, width, height} = imageData;
+    const gray = new Float32Array(width*height);
+    for(let i=0, p=0; i<data.length; i+=4, p++){
+      gray[p] = 0.299*data[i] + 0.587*data[i+1] + 0.114*data[i+2];
+    }
+    return gray;
+  }
+
+  // ---------- separable box blur (fast, prefix-sum based) ----------
+  function boxBlur1D(src, w, h, radius, horizontal){
+    const out = new Float32Array(w*h);
+    if(radius <= 0){ out.set(src); return out; }
+    if(horizontal){
+      for(let y=0; y<h; y++){
+        const rowStart = y*w;
+        let sum = 0, count = 0;
+        for(let x=-radius; x<=radius; x++){
+          const xi = Math.min(w-1, Math.max(0,x));
+          sum += src[rowStart+xi]; count++;
+        }
+        for(let x=0; x<w; x++){
+          out[rowStart+x] = sum/count;
+          const addX = Math.min(w-1, x+radius+1);
+          const remX = Math.max(0, x-radius);
+          sum += src[rowStart+addX] - src[rowStart+remX];
+        }
+      }
+    } else {
+      for(let x=0; x<w; x++){
+        let sum = 0, count = 0;
+        for(let y=-radius; y<=radius; y++){
+          const yi = Math.min(h-1, Math.max(0,y));
+          sum += src[yi*w+x]; count++;
+        }
+        for(let y=0; y<h; y++){
+          out[y*w+x] = sum/count;
+          const addY = Math.min(h-1, y+radius+1);
+          const remY = Math.max(0, y-radius);
+          sum += src[addY*w+x] - src[remY*w+x];
+        }
+      }
+    }
+    return out;
+  }
+
+  function gaussianApprox(src, w, h, radius){
+    let a = boxBlur1D(src, w, h, radius, true);
+    a = boxBlur1D(a, w, h, radius, false);
+    a = boxBlur1D(a, w, h, radius, true);
+    a = boxBlur1D(a, w, h, radius, false);
+    return a;
+  }
+
+  function getNoiseTile(w,h){
+    if(noiseTile && noiseTile.w===w && noiseTile.h===h) return noiseTile.data;
+    const data = new Float32Array(w*h);
+    for(let i=0;i<data.length;i++) data[i] = Math.random()*255;
+    noiseTile = {w,h,data};
+    return data;
+  }
+
+  // ---------- core render ----------
+  function render(){
+    if(!baseGray) return;
+    const w = imgW, h = imgH;
+    const blurAmt = parseInt(rangeBlur.value,10);
+    const intensity = parseInt(rangeIntensity.value,10)/100;
+    const grain = parseInt(rangeGrain.value,10)/100;
+
+    const inverted = new Float32Array(w*h);
+    for(let i=0;i<inverted.length;i++) inverted[i] = 255 - baseGray[i];
+
+    const blurred = gaussianApprox(inverted, w, h, blurAmt);
+
+    const ctx = sketchCanvas.getContext('2d');
+    const out = ctx.createImageData(w,h);
+    const noise = grain>0 ? getNoiseTile(w,h) : null;
+
+    // shading intensity controls how strong the dodge effect is vs flatter gray
+    const strength = 0.35 + intensity*1.15; // range approx 0.35 - 1.5
+
+    for(let p=0; p<w*h; p++){
+      let base = baseGray[p];
+      let b = blurred[p];
+      let dodge = (base*255) / (256 - b*strength);
+      if(dodge > 255) dodge = 255;
+
+      let val;
+      if(currentMode === 'ink'){
+        // push toward higher-contrast line-art: threshold-ish curve
+        val = Math.pow(dodge/255, 1.6) * 255;
+      } else if(currentMode === 'charcoal'){
+        // darker, richer blacks, less white paper showing through
+        val = dodge * 0.82 + (255-base) * 0.06;
+        val = Math.min(255, val);
+      } else {
+        val = dodge; // pencil / graphite default
+      }
+
+      if(noise){
+        val = val * (1 - grain*0.5) + noise[p]*grain*0.5;
+      }
+      if(val<0) val=0; if(val>255) val=255;
+
+      const idx = p*4;
+      out.data[idx] = val;
+      out.data[idx+1] = val;
+      out.data[idx+2] = val;
+      out.data[idx+3] = 255;
+    }
+    ctx.putImageData(out,0,0);
+  }
+
+  function scheduleRender(){
+    clearTimeout(debounceTimer);
+    statusNote.textContent = 'Sketching...';
+    debounceTimer = setTimeout(()=>{
+      render();
+      statusNote.textContent = '';
+    }, 60);
+  }
+
+  [rangeBlur, rangeIntensity, rangeGrain].forEach(r=>{
+    r.addEventListener('input', ()=>{
+      valBlur.textContent = rangeBlur.value;
+      valIntensity.textContent = rangeIntensity.value;
+      valGrain.textContent = rangeGrain.value;
+      scheduleRender();
+    });
+  });
+
+  modeRow.addEventListener('click', e=>{
+    const btn = e.target.closest('.mode-btn');
+    if(!btn) return;
+    modeRow.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = btn.dataset.mode;
+    scheduleRender();
+  });
+
+  // ---------- before/after slider handle ----------
+  function resetHandle(){
+    setHandle(50);
+  }
+  function setHandle(percent){
+    percent = Math.min(100, Math.max(0, percent));
+    afterLayer.style.width = percent + '%';
+    handle.style.left = percent + '%';
+  }
+  function handlePointer(clientX){
+    const rect = compareBox.getBoundingClientRect();
+    const percent = ((clientX - rect.left) / rect.width) * 100;
+    setHandle(percent);
+  }
+  let dragging = false;
+  compareBox.addEventListener('pointerdown', e=>{ dragging=true; handlePointer(e.clientX); });
+  window.addEventListener('pointermove', e=>{ if(dragging) handlePointer(e.clientX); });
+  window.addEventListener('pointerup', ()=> dragging=false);
+
+  // ---------- download ----------
+  function downloadResult(){
+    const link = document.createElement('a');
+    link.download = 'pencil-sketch.png';
+    link.href = sketchCanvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+})();
+</script>
+</body>
+</html>
