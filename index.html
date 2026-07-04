@@ -227,8 +227,8 @@
         <input type="range" id="rangeBlur" min="1" max="25" value="7">
       </div>
       <div class="slider-row">
-        <label>Shading intensity <span class="val" id="valIntensity">50</span></label>
-        <input type="range" id="rangeIntensity" min="0" max="100" value="50">
+        <label>Shading intensity <span class="val" id="valIntensity">65</span></label>
+        <input type="range" id="rangeIntensity" min="0" max="100" value="65">
       </div>
       <div class="slider-row">
         <label>Paper grain <span class="val" id="valGrain">18</span></label>
@@ -425,12 +425,22 @@
 
     // shading intensity controls how strong the dodge effect is vs flatter gray
     const strength = 0.35 + intensity*1.15; // range approx 0.35 - 1.5
+    // tone factor: how much we pull dark original tones back in, so smooth
+    // dark regions (hair, shadow, dark fabric) don't wash out to white —
+    // only truly bright areas stay near-white.
+    const toneFactor = 0.25 + intensity*0.65; // 0.25 - 0.9
 
     for(let p=0; p<w*h; p++){
       let base = baseGray[p];
       let b = blurred[p];
       let dodge = (base*255) / (256 - b*strength);
       if(dodge > 255) dodge = 255;
+
+      // pull midtones/shadows back toward the original tone so flat dark
+      // areas keep depth instead of blowing out to white
+      const shade = 255 - (255 - base) * toneFactor;
+      dodge = dodge * (shade/255);
+      if(dodge>255) dodge=255;
 
       let val;
       if(currentMode === 'ink'){
