@@ -2,19 +2,44 @@
 <html lang="ur" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>میری ڈیزائن سروس</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f4; }
-        .button { background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-size: 18px; margin: 10px; display: inline-block; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            text-align: center; 
+            padding: 50px 20px; 
+            background-color: #f9f9f9; 
+            margin: 0;
+        }
+        h1 { color: #333; }
+        p { color: #666; margin-bottom: 30px; }
+        .button-container { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .button { 
+            background-color: #007bff; 
+            color: white; 
+            padding: 15px 25px; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            font-size: 18px; 
+            width: 250px; 
+            transition: 0.3s;
+        }
         .button:hover { background-color: #0056b3; }
+        .secondary { background-color: #6c757d; }
+        .secondary:hover { background-color: #5a6268; }
     </style>
 </head>
 <body>
     <h1>خوش آمدید!</h1>
     <p>اپنے سوشل میڈیا ڈیزائن اور اینیمیٹڈ پوسٹس یہاں بنائیں۔</p>
     
-    <br>
-    <a href="https://www.canva.com" class="button" target="_blank">ڈیزائن شروع کریں</a>
-    <a href="#" class="button">ڈاؤن لوڈر سروس (جلد آ رہی ہے)</a>
+    <div class="button-container">
+        <!-- یہاں اپنی کینوا ٹیمپلیٹ لنک لگائیں -->
+        <a href="https://www.canva.com" class="button" target="_blank">ڈیزائن شروع کریں</a>
+        
+        <!-- ڈاؤنلوڈر سروس کا لنک -->
+        <a href="#" class="button secondary">ڈاؤنلوڈر سروس (جلد آ رہی ہے)</a>
+    </div>
 </body>
 </html>
