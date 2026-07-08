@@ -3,43 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>میری ڈیزائن سروس</title>
+    <title>Design Hub</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            text-align: center; 
-            padding: 50px 20px; 
-            background-color: #f9f9f9; 
-            margin: 0;
-        }
-        h1 { color: #333; }
-        p { color: #666; margin-bottom: 30px; }
-        .button-container { display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .button { 
-            background-color: #007bff; 
-            color: white; 
-            padding: 15px 25px; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            font-size: 18px; 
-            width: 250px; 
-            transition: 0.3s;
-        }
-        .button:hover { background-color: #0056b3; }
-        .secondary { background-color: #6c757d; }
-        .secondary:hover { background-color: #5a6268; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .lang-btn { background: #333; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
+        h1 { color: #2c3e50; }
+        .btn-group { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        .btn { padding: 15px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .primary { background: #007bff; color: white; }
+        .secondary { background: #6c757d; color: white; }
+        .btn:hover { opacity: 0.9; }
     </style>
 </head>
 <body>
-    <h1>خوش آمدید!</h1>
-    <p>اپنے سوشل میڈیا ڈیزائن اور اینیمیٹڈ پوسٹس یہاں بنائیں۔</p>
+
+<div class="container">
+    <button class="lang-btn" onclick="toggleLang()">English / اردو</button>
     
-    <div class="button-container">
-        <!-- یہاں اپنی کینوا ٹیمپلیٹ لنک لگائیں -->
-        <a href="https://www.canva.com" class="button" target="_blank">ڈیزائن شروع کریں</a>
-        
-        <!-- ڈاؤنلوڈر سروس کا لنک -->
-        <a href="#" class="button secondary">ڈاؤنلوڈر سروس (جلد آ رہی ہے)</a>
+    <h1 id="title">خوش آمدید!</h1>
+    <p id="desc">اپنے سوشل میڈیا ڈیزائن اور اینیمیٹڈ پوسٹس یہاں بنائیں۔</p>
+    
+    <div class="btn-group">
+        <a href="#" class="btn primary" id="btn1">ڈیزائن شروع کریں</a>
+        <a href="#" class="btn secondary" id="btn2">ڈاؤنلوڈر سروس (جلد آ رہی ہے)</a>
     </div>
+</div>
+
+<script>
+    let isUrdu = true;
+    function toggleLang() {
+        isUrdu = !isUrdu;
+        document.documentElement.dir = isUrdu ? "rtl" : "ltr";
+        document.getElementById("title").innerText = isUrdu ? "خوش آمدید!" : "Welcome!";
+        document.getElementById("desc").innerText = isUrdu ? "اپنے سوشل میڈیا ڈیزائن اور اینیمیٹڈ پوسٹس یہاں بنائیں۔" : "Create your social media designs and animated posts here.";
+        document.getElementById("btn1").innerText = isUrdu ? "ڈیزائن شروع کریں" : "Start Designing";
+        document.getElementById("btn2").innerText = isUrdu ? "ڈاؤنلوڈر سروس (جلد آ رہی ہے)" : "Downloader Service (Coming Soon)";
+    }
+</script>
+
 </body>
 </html>
