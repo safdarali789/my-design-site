@@ -1,357 +1,788 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ur">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Social Media Creator</title>
+    <title>سوشل میڈیا پوسٹ کریٹر | Social Media Post Creator</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); min-height: 100vh; color: #e2e8f0; }
-        .header { background: rgba(15, 23, 42, 0.8); padding: 16px 24px; border-bottom: 1px solid rgba(148, 163, 184, 0.1); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .logo { font-size: 20px; font-weight: 700; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .btn-download { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4); }
-        .main { display: grid; grid-template-columns: 300px 1fr 300px; gap: 0; height: calc(100vh - 64px); }
-        @media (max-width: 1024px) { .main { grid-template-columns: 280px 1fr; } .right { display: none; } }
-        @media (max-width: 768px) { .main { grid-template-columns: 1fr; } .left { display: none; } }
-        .panel { background: rgba(30, 41, 59, 0.5); border-right: 1px solid rgba(148, 163, 184, 0.1); overflow-y: auto; padding: 20px; }
-        .right { border-left: 1px solid rgba(148, 163, 184, 0.1); }
-        .center { display: flex; align-items: center; justify-content: center; background: linear-gradient(45deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%); overflow: auto; }
-        canvas { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); border-radius: 8px; max-width: 90%; height: auto; }
-        .section { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin: 20px 0 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(148, 163, 184, 0.1); }
-        .section:first-child { margin-top: 0; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-        .btn { padding: 10px 8px; background: rgba(148, 163, 184, 0.05); border: 1px solid rgba(148, 163, 184, 0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: 600; text-align: center; transition: all 0.3s; }
-        .btn:hover { background: rgba(59, 130, 246, 0.1); border-color: #3b82f6; color: #3b82f6; }
-        .btn.active { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); border-color: transparent; color: white; }
-        .control { margin-bottom: 14px; }
-        .label { display: block; font-size: 12px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        input, textarea, select { width: 100%; padding: 8px 10px; background: rgba(148, 163, 184, 0.05); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 6px; color: #e2e8f0; font-size: 12px; font-family: inherit; transition: all 0.3s; }
-        input:focus, textarea:focus, select:focus { background: rgba(59, 130, 246, 0.1); border-color: #3b82f6; outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
-        textarea { resize: vertical; min-height: 60px; font-family: 'Courier New', monospace; }
-        input[type="color"] { cursor: pointer; padding: 4px; height: 40px; }
-        .slider { display: grid; grid-template-columns: 1fr 40px; gap: 10px; align-items: center; }
-        input[type="range"] { width: 100%; height: 4px; background: rgba(148, 163, 184, 0.2); border-radius: 2px; outline: none; -webkit-appearance: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); cursor: pointer; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4); }
-        .value { font-size: 11px; color: #94a3b8; font-weight: 600; text-align: right; }
-        .tabs { display: flex; gap: 0; border-bottom: 1px solid rgba(148, 163, 184, 0.1); margin-bottom: 16px; }
-        .tab { flex: 1; padding: 10px 0; border: none; background: none; color: #94a3b8; cursor: pointer; font-weight: 600; font-size: 12px; border-bottom: 2px solid transparent; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.5px; }
-        .tab:hover { color: #cbd5e1; }
-        .tab.active { color: #3b82f6; border-bottom-color: #3b82f6; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .emoji { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-height: 120px; overflow-y: auto; margin-bottom: 12px; }
-        .emoji-btn { aspect-ratio: 1; border: 1px solid rgba(148, 163, 184, 0.2); background: rgba(148, 163, 184, 0.05); border-radius: 6px; cursor: pointer; font-size: 20px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-        .emoji-btn:hover { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; transform: scale(1.1); }
-        .filter { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
-        .filter-btn { padding: 8px; background: rgba(148, 163, 184, 0.05); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 6px; color: #cbd5e1; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.3s; }
-        .filter-btn:hover { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #3b82f6; }
-        .checkbox { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #3b82f6; }
-        .status { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 12px 24px; border-radius: 8px; font-size: 12px; font-weight: 600; box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3); z-index: 1000; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
-        .status.show { opacity: 1; pointer-events: auto; }
-        .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 20px; }
-        .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; text-transform: uppercase; transition: all 0.3s; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4); }
-        .btn-secondary { background: rgba(148, 163, 184, 0.1); color: #cbd5e1; padding: 10px; border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; text-transform: uppercase; transition: all 0.3s; }
-        .btn-secondary:hover { background: rgba(148, 163, 184, 0.15); border-color: rgba(148, 163, 184, 0.3); }
-        .info { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 6px; padding: 12px; font-size: 11px; color: #93c5fd; line-height: 1.6; margin-top: 16px; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(148, 163, 184, 0.05); }
-        ::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.4); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(59, 130, 246, 0.6); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            overflow-y: auto;
+            max-height: 800px;
+        }
+        .preview-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 600px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            position: relative;
+        }
+        canvas {
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            cursor: crosshair;
+            max-width: 100%;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            margin: 15px 0 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .template-btn {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .template-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        .template-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="color"],
+        input[type="number"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+            font-size: 12px;
+        }
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus,
+        input[type="color"]:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+        .color-picker-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .color-input {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .color-input input[type="color"] {
+            width: 50px;
+            height: 36px;
+            cursor: pointer;
+        }
+        .slider-group {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+        .font-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+        .font-option {
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+        .font-option:hover {
+            border-color: #667eea;
+        }
+        .font-option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .shape-tools {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+        .shape-btn {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+        .shape-btn:hover {
+            background: #f0f4ff;
+            border-color: #667eea;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 12px;
+            border-bottom: 2px solid transparent;
+            color: #999;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .effects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .effect-item {
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+        .effect-item:hover {
+            background: #e8f0ff;
+        }
+        .status-bar {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .loader {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">✨ Pro Creator</div>
-        <button class="btn-download" onclick="downloadImage()">⬇️ Export</button>
+    <div class="container">
+        <div class="header">
+            <h1>✨ سوشل میڈیا پوسٹ کریٹر</h1>
+            <p>Professional Social Media Post Designer</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Control Panel -->
+            <div class="panel">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('templates')">ٹمپلیس</button>
+                    <button class="tab" onclick="switchTab('text')">ٹیکسٹ</button>
+                    <button class="tab" onclick="switchTab('design')">ڈیزائن</button>
+                    <button class="tab" onclick="switchTab('effects')">اثرات</button>
+                </div>
+
+                <!-- Templates Tab -->
+                <div id="templates" class="tab-content active">
+                    <div class="section-title">سوشل میڈیا ٹمپلیس</div>
+                    <div class="template-grid">
+                        <button class="template-btn active" onclick="selectTemplate(1080, 1350, 'Instagram Story')">📱 Instagram<br>Story</button>
+                        <button class="template-btn" onclick="selectTemplate(1080, 1080, 'Instagram Post')">📸 Instagram<br>Post</button>
+                        <button class="template-btn" onclick="selectTemplate(1200, 628, 'Facebook')">👍 Facebook<br>Cover</button>
+                        <button class="template-btn" onclick="selectTemplate(1024, 512, 'Twitter/X')">𝕏 Twitter/X<br>Header</button>
+                        <button class="template-btn" onclick="selectTemplate(1200, 1500, 'Pinterest')">📌 Pinterest<br>Pin</button>
+                        <button class="template-btn" onclick="selectTemplate(1280, 720, 'YouTube')">▶️ YouTube<br>Thumbnail</button>
+                        <button class="template-btn" onclick="selectTemplate(1080, 1920, 'TikTok')">🎵 TikTok<br>Video</button>
+                        <button class="template-btn" onclick="selectTemplate(800, 600, 'Custom')">⚙️ Custom<br>Size</button>
+                    </div>
+                </div>
+
+                <!-- Text Tab -->
+                <div id="text" class="tab-content">
+                    <div class="control-group">
+                        <label>عنوان (Title)</label>
+                        <input type="text" id="titleInput" placeholder="اپنا ہیڈنگ لکھیں / Write your heading" 
+                               value="Your Amazing Title" onchange="updateCanvas()" oninput="updateCanvas()">
+                    </div>
+                    <div class="slider-group">
+                        <label>سائز: <span id="titleSizeValue">48</span>px</label>
+                        <input type="range" id="titleSize" min="20" max="80" value="48" onchange="updateCanvas()">
+                    </div>
+                    <div class="color-input">
+                        <label style="flex: 1;">عنوان رنگ</label>
+                        <input type="color" id="titleColor" value="#ffffff" onchange="updateCanvas()">
+                    </div>
+
+                    <div class="control-group" style="margin-top: 15px;">
+                        <label>تفصیل (Description)</label>
+                        <textarea id="descInput" placeholder="اپنا پیغام لکھیں / Write your message" 
+                                  onchange="updateCanvas()" oninput="updateCanvas()">Add your description here for more impact and engagement!</textarea>
+                    </div>
+                    <div class="slider-group">
+                        <label>سائز: <span id="descSizeValue">20</span>px</label>
+                        <input type="range" id="descSize" min="12" max="40" value="20" onchange="updateCanvas()">
+                    </div>
+                    <div class="color-input">
+                        <label style="flex: 1;">تفصیل رنگ</label>
+                        <input type="color" id="descColor" value="#ffffff" onchange="updateCanvas()">
+                    </div>
+
+                    <div class="control-group" style="margin-top: 15px;">
+                        <label>فونٹ فیملی (Font Family)</label>
+                        <div class="font-selector">
+                            <div class="font-option selected" style="font-family: Arial;" onclick="changeFontFamily('Arial')">Arial</div>
+                            <div class="font-option" style="font-family: Georgia;" onclick="changeFontFamily('Georgia')">Georgia</div>
+                            <div class="font-option" style="font-family: Courier;" onclick="changeFontFamily('Courier')">Courier</div>
+                            <div class="font-option" style="font-family: Impact;" onclick="changeFontFamily('Impact')">Impact</div>
+                            <div class="font-option" style="font-family: Comic Sans MS;" onclick="changeFontFamily('Comic Sans MS')">Comic</div>
+                            <div class="font-option" style="font-family: Verdana;" onclick="changeFontFamily('Verdana')">Verdana</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Design Tab -->
+                <div id="design" class="tab-content">
+                    <div class="section-title">پس منظر (Background)</div>
+                    
+                    <div class="control-group">
+                        <label>بیک گراؤنڈ رنگ</label>
+                        <input type="color" id="bgColor" value="#667eea" onchange="updateCanvas()">
+                    </div>
+
+                    <div class="control-group">
+                        <label>یا تصویر اپ لوڈ کریں</label>
+                        <input type="file" id="bgImage" accept="image/*" onchange="loadBackgroundImage()">
+                    </div>
+
+                    <div class="control-group">
+                        <label>گریڈیئنٹ اسٹائل</label>
+                        <select id="gradientType" onchange="updateCanvas()">
+                            <option value="none">کوئی نہیں</option>
+                            <option value="linear-h">لیٹرل (بائیں سے دائیں)</option>
+                            <option value="linear-v">عمودی (اوپر سے نیچے)</option>
+                            <option value="diagonal">ڈائیگونل</option>
+                            <option value="radial">سرکلر</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>گریڈیئنٹ رنگ 1</label>
+                        <input type="color" id="gradColor1" value="#667eea" onchange="updateCanvas()">
+                    </div>
+
+                    <div class="control-group">
+                        <label>گریڈیئنٹ رنگ 2</label>
+                        <input type="color" id="gradColor2" value="#764ba2" onchange="updateCanvas()">
+                    </div>
+
+                    <div class="section-title" style="margin-top: 20px;">شیپس اور عناصر</div>
+                    <div class="shape-tools">
+                        <button class="shape-btn" onclick="addShape('rect')">▭ مربع</button>
+                        <button class="shape-btn" onclick="addShape('circle')">● دائرہ</button>
+                        <button class="shape-btn" onclick="addShape('triangle')">▲ مثلث</button>
+                        <button class="shape-btn" onclick="addShape('line')">━ لائن</button>
+                    </div>
+
+                    <div class="control-group" style="margin-top: 15px;">
+                        <label>شیپ کا رنگ</label>
+                        <input type="color" id="shapeColor" value="#ffffff" onchange="updateCanvas()">
+                    </div>
+
+                    <div class="section-title" style="margin-top: 20px;">سایہ اور بوردر</div>
+                    <div class="control-group">
+                        <label>سایہ شامل کریں</label>
+                        <input type="checkbox" id="shadowToggle" onchange="updateCanvas()" style="width: 16px;">
+                    </div>
+
+                    <div class="control-group">
+                        <label>بوردر شامل کریں</label>
+                        <input type="checkbox" id="borderToggle" onchange="updateCanvas()" style="width: 16px;">
+                    </div>
+                </div>
+
+                <!-- Effects Tab -->
+                <div id="effects" class="tab-content">
+                    <div class="section-title">متن کے اثرات</div>
+                    <div class="effects-grid">
+                        <div class="effect-item" onclick="applyEffect('bold')">🔤 Bold</div>
+                        <div class="effect-item" onclick="applyEffect('italic')">𝘐 Italic</div>
+                        <div class="effect-item" onclick="applyEffect('outline')">⊕ Outline</div>
+                        <div class="effect-item" onclick="applyEffect('shadow')">⬡ Shadow</div>
+                        <div class="effect-item" onclick="applyEffect('neon')">💫 Neon</div>
+                        <div class="effect-item" onclick="applyEffect('3d')">3️⃣ 3D Effect</div>
+                    </div>
+
+                    <div class="section-title" style="margin-top: 20px;">منتخب شدہ اثرات</div>
+                    <div id="effectsList" style="font-size: 12px; color: #666; padding: 10px; background: #f5f5f5; border-radius: 6px;">
+                        کوئی اثر منتخب نہیں
+                    </div>
+
+                    <div class="section-title" style="margin-top: 20px;">فلٹرز</div>
+                    <div class="slider-group">
+                        <label>روشنی: <span id="brightnessValue">100</span>%</label>
+                        <input type="range" id="brightness" min="50" max="150" value="100" onchange="updateCanvas()">
+                    </div>
+                    <div class="slider-group">
+                        <label>سنترتا: <span id="contrastValue">100</span>%</label>
+                        <input type="range" id="contrast" min="50" max="150" value="100" onchange="updateCanvas()">
+                    </div>
+                    <div class="slider-group">
+                        <label>بہتری: <span id="saturationValue">100</span>%</label>
+                        <input type="range" id="saturation" min="0" max="200" value="100" onchange="updateCanvas()">
+                    </div>
+                </div>
+
+                <!-- Download Section -->
+                <div class="button-group" style="margin-top: 20px;">
+                    <button class="btn-primary" onclick="downloadImage()">⬇️ ڈاؤن لوڈ</button>
+                    <button class="btn-secondary" onclick="resetDesign()">↺ دوبارہ شروع</button>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview-section">
+                <canvas id="canvas" width="1080" height="1350"></canvas>
+            </div>
+        </div>
+
+        <div class="status-bar" id="statusBar">تیار ہے | Ready to create amazing posts! 🎨</div>
     </div>
-
-    <div class="main">
-        <div class="panel left">
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab(event, 'design')">Design</button>
-                <button class="tab" onclick="switchTab(event, 'text')">Text</button>
-                <button class="tab" onclick="switchTab(event, 'style')">Style</button>
-            </div>
-
-            <div id="design" class="tab-content active">
-                <div class="section">Platforms</div>
-                <div class="grid">
-                    <button class="btn active" onclick="setPlatform(1080, 1080, 'Instagram')">📸 Instagram</button>
-                    <button class="btn" onclick="setPlatform(1080, 1350, 'Story')">📱 Story</button>
-                    <button class="btn" onclick="setPlatform(1200, 628, 'Facebook')">👍 Facebook</button>
-                    <button class="btn" onclick="setPlatform(1024, 512, 'Twitter')">𝕏 Twitter</button>
-                    <button class="btn" onclick="setPlatform(1200, 1500, 'Pinterest')">📌 Pinterest</button>
-                    <button class="btn" onclick="setPlatform(1280, 720, 'YouTube')">▶️ YouTube</button>
-                    <button class="btn" onclick="setPlatform(1080, 1920, 'TikTok')">🎵 TikTok</button>
-                    <button class="btn" onclick="setPlatform(800, 600, 'Custom')">⚙️ Custom</button>
-                </div>
-
-                <div class="section">Templates</div>
-                <div class="grid" id="templates"></div>
-            </div>
-
-            <div id="text" class="tab-content">
-                <div class="control">
-                    <label class="label">Headline</label>
-                    <textarea id="title" onchange="updateCanvas()" oninput="updateCanvas()">Your Amazing Title</textarea>
-                </div>
-                <div class="control">
-                    <label class="label">Subtitle</label>
-                    <textarea id="desc" onchange="updateCanvas()" oninput="updateCanvas()">Add supporting text here</textarea>
-                </div>
-                <div class="control">
-                    <label class="label">Font Size</label>
-                    <div class="slider">
-                        <input type="range" id="size" min="20" max="80" value="48" onchange="updateCanvas()">
-                        <div class="value" id="sizeVal">48</div>
-                    </div>
-                </div>
-                <div class="control">
-                    <label class="label">Text Color</label>
-                    <input type="color" id="color" value="#000000" onchange="updateCanvas()">
-                </div>
-                <div class="control">
-                    <label class="label">Font</label>
-                    <select id="font" onchange="updateCanvas()">
-                        <option value="Arial">Arial</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Impact" selected>Impact</option>
-                        <option value="Courier">Courier</option>
-                    </select>
-                </div>
-                <div class="section" style="margin-top: 20px;">Effects</div>
-                <div class="checkbox">
-                    <input type="checkbox" id="bold" onchange="updateCanvas()">
-                    <label>Bold</label>
-                </div>
-                <div class="checkbox">
-                    <input type="checkbox" id="italic" onchange="updateCanvas()">
-                    <label>Italic</label>
-                </div>
-                <div class="checkbox">
-                    <input type="checkbox" id="shadow" onchange="updateCanvas()">
-                    <label>Shadow</label>
-                </div>
-            </div>
-
-            <div id="style" class="tab-content">
-                <div class="control">
-                    <label class="label">Color 1</label>
-                    <input type="color" id="bg1" value="#1e88e5" onchange="updateCanvas()">
-                </div>
-                <div class="control">
-                    <label class="label">Color 2</label>
-                    <input type="color" id="bg2" value="#42a5f5" onchange="updateCanvas()">
-                </div>
-                <div class="control">
-                    <label class="label">Gradient</label>
-                    <select id="grad" onchange="updateCanvas()">
-                        <option value="h">Left to Right</option>
-                        <option value="v">Top to Bottom</option>
-                        <option value="d">Diagonal</option>
-                        <option value="r">Circular</option>
-                    </select>
-                </div>
-                <div class="control">
-                    <label class="label">Image</label>
-                    <input type="file" id="img" accept="image/*" onchange="loadImage()">
-                </div>
-                <div class="control">
-                    <label class="label">Image Opacity</label>
-                    <div class="slider">
-                        <input type="range" id="imgop" min="0" max="1" step="0.1" value="0.6" onchange="updateCanvas()">
-                        <div class="value" id="imgopVal">60%</div>
-                    </div>
-                </div>
-                <div class="section" style="margin-top: 20px;">Filters</div>
-                <div class="filter">
-                    <button class="filter-btn" onclick="filter('bright', 120)">Bright</button>
-                    <button class="filter-btn" onclick="filter('contrast', 120)">Contrast</button>
-                    <button class="filter-btn" onclick="filter('sepia', 100)">Sepia</button>
-                </div>
-                <div class="control">
-                    <label class="label">Brightness</label>
-                    <div class="slider">
-                        <input type="range" id="bright" min="50" max="200" value="100" onchange="updateCanvas()">
-                        <div class="value" id="brightVal">100%</div>
-                    </div>
-                </div>
-                <div class="control">
-                    <label class="label">Contrast</label>
-                    <div class="slider">
-                        <input type="range" id="contrast" min="50" max="200" value="100" onchange="updateCanvas()">
-                        <div class="value" id="contrastVal">100%</div>
-                    </div>
-                </div>
-                <div class="control">
-                    <label class="label">Saturation</label>
-                    <div class="slider">
-                        <input type="range" id="sat" min="0" max="200" value="100" onchange="updateCanvas()">
-                        <div class="value" id="satVal">100%</div>
-                    </div>
-                </div>
-                <div class="control">
-                    <label class="label">Blur</label>
-                    <div class="slider">
-                        <input type="range" id="blur" min="0" max="20" value="0" onchange="updateCanvas()">
-                        <div class="value" id="blurVal">0px</div>
-                    </div>
-                </div>
-                <div class="btns">
-                    <button class="btn-secondary" onclick="location.reload()">↺ Reset</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="center">
-            <canvas id="canvas" width="1080" height="1080"></canvas>
-        </div>
-
-        <div class="panel right">
-            <div class="section">Stickers</div>
-            <div class="emoji" id="stickers"></div>
-            <div class="section">Icons</div>
-            <div class="emoji" id="icons"></div>
-            <div class="info">
-                <strong>Pro Tip:</strong> Use stickers and icons to enhance your design. Click any emoji to add it.
-            </div>
-            <div class="info" style="margin-top: 12px;">
-                <strong>Size:</strong><br><span id="info">1080 × 1080 px</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="status" id="status">Ready to create ✨</div>
 
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        let bgImg = null;
+        let currentFont = 'Arial';
+        let activeEffects = [];
+        let backgroundImage = null;
 
-        const tmpl = [
-            {n:'Blue',g1:'#1e88e5',g2:'#42a5f5'},{n:'Purple',g1:'#7e57c2',g2:'#ab47bc'},{n:'Pink',g1:'#ec407a',g2:'#f06292'},
-            {n:'Cyan',g1:'#00acc1',g2:'#26c6da'},{n:'Green',g1:'#43a047',g2:'#66bb6a'},{n:'Orange',g1:'#fb8c00',g2:'#ffa726'},
-            {n:'Red',g1:'#e53935',g2:'#ef5350'},{n:'Teal',g1:'#00796b',g2:'#009688'},{n:'Indigo',g1:'#3949ab',g2:'#5c6bc0'},
-            {n:'Amber',g1:'#f57f17',g2:'#fbc02d'}
-        ];
-        const stk = ['😀','😍','🎉','⭐','💯','🔥','✨','🚀','💡','👍','❤️','💖','🎨','🌟','🎯','💼'];
-        const ico = ['🏠','📱','🎬','📸','🎵','📊','💻','🎓','🏆','🎁','📚','🌍','🚗','✈️','🍕'];
+        const templateSizes = {
+            'Instagram Story': { w: 1080, h: 1350 },
+            'Instagram Post': { w: 1080, h: 1080 },
+            'Facebook': { w: 1200, h: 628 },
+            'Twitter/X': { w: 1024, h: 512 },
+            'Pinterest': { w: 1200, h: 1500 },
+            'YouTube': { w: 1280, h: 720 },
+            'TikTok': { w: 1080, h: 1920 }
+        };
 
-        function initTemplates(){
-            const t=document.getElementById('templates');
-            t.innerHTML='';
-            tmpl.forEach((x,i)=>{
-                const c=document.createElement('div');
-                c.className=`btn ${i===0?'active':''}`;
-                c.style.background=`linear-gradient(135deg,${x.g1},${x.g2})`;
-                c.textContent=x.n;
-                c.onclick=()=>selectTemplate(x,c);
-                t.appendChild(c);
-            });
+        function selectTemplate(width, height, name) {
+            canvas.width = width;
+            canvas.height = height;
+            
+            document.querySelectorAll('.template-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.template-btn').classList.add('active');
+            
+            updateCanvas();
+            showStatus(`${name} منتخب کیا گیا | Template selected: ${name}`);
         }
 
-        function initEmojis(){
-            const s=document.getElementById('stickers'),i=document.getElementById('icons');
-            [s,i].forEach(e=>e.innerHTML='');
-            stk.forEach(x=>{const b=document.createElement('button');b.className='emoji-btn';b.textContent=x;b.onclick=()=>msg(`Added ${x}`);document.getElementById('stickers').appendChild(b);});
-            ico.forEach(x=>{const b=document.createElement('button');b.className='emoji-btn';b.textContent=x;b.onclick=()=>msg(`Added ${x}`);document.getElementById('icons').appendChild(b);});
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
         }
 
-        function setPlatform(w,h,n){canvas.width=w;canvas.height=h;document.getElementById('info').textContent=`${w} × ${h} px`;document.querySelectorAll('.grid:first-child .btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');updateCanvas();msg(`Switched to ${n}`);}
+        function updateCanvas() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const bgColor = document.getElementById('bgColor').value;
+            const titleText = document.getElementById('titleInput').value;
+            const descText = document.getElementById('descInput').value;
+            const titleSize = parseInt(document.getElementById('titleSize').value);
+            const descSize = parseInt(document.getElementById('descSize').value);
+            const titleColor = document.getElementById('titleColor').value;
+            const descColor = document.getElementById('descColor').value;
+            const gradientType = document.getElementById('gradientType').value;
+            const brightness = parseInt(document.getElementById('brightness').value);
+            const contrast = parseInt(document.getElementById('contrast').value);
+            const saturation = parseInt(document.getElementById('saturation').value);
 
-        function selectTemplate(t,c){document.getElementById('bg1').value=t.g1;document.getElementById('bg2').value=t.g2;document.querySelectorAll('#templates .btn').forEach(b=>b.classList.remove('active'));c.classList.add('active');updateCanvas();}
+            // Clear canvas
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, width, height);
 
-        function loadImage(){const f=document.getElementById('img').files[0];if(f){const r=new FileReader();r.onload=e=>{const i=new Image();i.onload=()=>{bgImg=i;updateCanvas();msg('Image loaded');};i.src=e.target.result;};r.readAsDataURL(f);}}
+            // Apply gradient if selected
+            if (gradientType !== 'none') {
+                let gradient;
+                const gradColor1 = document.getElementById('gradColor1').value;
+                const gradColor2 = document.getElementById('gradColor2').value;
 
-        function updateCanvas(){
-            const w=canvas.width,h=canvas.height;
-            const b1=document.getElementById('bg1').value,b2=document.getElementById('bg2').value;
-            const gd=document.getElementById('grad').value;
-            const op=parseFloat(document.getElementById('imgop').value);
-            const br=document.getElementById('bright').value;
-            const co=document.getElementById('contrast').value;
-            const sa=document.getElementById('sat').value;
-            const bl=document.getElementById('blur').value;
+                if (gradientType === 'linear-h') {
+                    gradient = ctx.createLinearGradient(0, 0, width, 0);
+                } else if (gradientType === 'linear-v') {
+                    gradient = ctx.createLinearGradient(0, 0, 0, height);
+                } else if (gradientType === 'diagonal') {
+                    gradient = ctx.createLinearGradient(0, 0, width, height);
+                } else if (gradientType === 'radial') {
+                    gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, Math.max(width, height)/2);
+                }
 
-            ctx.fillStyle=b1;
-            ctx.fillRect(0,0,w,h);
+                gradient.addColorStop(0, gradColor1);
+                gradient.addColorStop(1, gradColor2);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+            }
 
-            let g;
-            if(gd==='h')g=ctx.createLinearGradient(0,0,w,0);
-            else if(gd==='v')g=ctx.createLinearGradient(0,0,0,h);
-            else if(gd==='d')g=ctx.createLinearGradient(0,0,w,h);
-            else g=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)/2);
-            g.addColorStop(0,b1);
-            g.addColorStop(1,b2);
-            ctx.fillStyle=g;
-            ctx.fillRect(0,0,w,h);
+            // Draw background image if loaded
+            if (backgroundImage) {
+                ctx.globalAlpha = 0.7;
+                ctx.drawImage(backgroundImage, 0, 0, width, height);
+                ctx.globalAlpha = 1.0;
+            }
 
-            if(bgImg){ctx.globalAlpha=op;ctx.drawImage(bgImg,0,0,w,h);ctx.globalAlpha=1;}
+            // Apply filters
+            ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
 
-            ctx.filter=`brightness(${br}%) contrast(${co}%) saturate(${sa}%) blur(${bl}px)`;
+            // Draw shadow if enabled
+            if (document.getElementById('shadowToggle').checked) {
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetX = 3;
+                ctx.shadowOffsetY = 3;
+            }
 
-            const t=document.getElementById('title').value;
-            const d=document.getElementById('desc').value;
-            const s=parseInt(document.getElementById('size').value);
-            const cl=document.getElementById('color').value;
-            const f=document.getElementById('font').value;
-            const bo=document.getElementById('bold').checked;
-            const it=document.getElementById('italic').checked;
-            const sh=document.getElementById('shadow').checked;
+            // Draw title
+            ctx.fillStyle = titleColor;
+            ctx.font = `bold ${titleSize}px ${currentFont}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            if (activeEffects.includes('outline')) {
+                ctx.strokeStyle = titleColor;
+                ctx.lineWidth = 3;
+                ctx.strokeText(titleText, width / 2, height / 2 - 50);
+            }
+            
+            if (activeEffects.includes('3d')) {
+                for (let i = 5; i > 0; i--) {
+                    ctx.fillStyle = changeOpacity(titleColor, 0.3);
+                    ctx.fillText(titleText, width / 2 + i, height / 2 - 50 + i);
+                }
+                ctx.fillStyle = titleColor;
+            }
 
-            let fs='';
-            if(bo)fs+='bold ';
-            if(it)fs+='italic ';
-            fs+=`${s}px ${f}`;
+            ctx.fillText(titleText, width / 2, height / 2 - 50);
 
-            ctx.font=fs;
-            ctx.textAlign='center';
-            ctx.textBaseline='middle';
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
 
-            if(sh){ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=20;ctx.shadowOffsetX=4;ctx.shadowOffsetY=4;}
+            // Draw description
+            ctx.fillStyle = descColor;
+            ctx.font = `${descSize}px ${currentFont}`;
+            wrapText(ctx, descText, width / 2, height / 2 + 50, width - 40, descSize + 10);
 
-            ctx.fillStyle=cl;
-            ctx.strokeStyle='rgba(0,0,0,0.3)';
-            ctx.lineWidth=3;
-            ctx.strokeText(t,w/2,h/2-80);
-            ctx.fillText(t,w/2,h/2-80);
-
-            ctx.shadowColor='transparent';
-            ctx.font=`${s*0.5}px ${f}`;
-            ctx.fillStyle=cl;
-            ctx.strokeStyle='rgba(0,0,0,0.2)';
-            ctx.lineWidth=2;
-            ctx.strokeText(d,w/2,h/2+60);
-            ctx.fillText(d,w/2,h/2+60);
-
-            ctx.filter='none';
+            ctx.filter = 'none';
         }
 
-        function filter(t,v){
-            if(t==='bright')document.getElementById('bright').value=v;
-            else if(t==='contrast')document.getElementById('contrast').value=v;
-            else if(t==='sepia'){document.getElementById('bright').value=110;document.getElementById('sat').value=80;}
+        function wrapText(context, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            let lineNumber = 0;
+
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const metrics = context.measureText(testLine);
+                const testWidth = metrics.width;
+
+                if (testWidth > maxWidth && n > 0) {
+                    context.fillText(line, x, y + lineNumber * lineHeight);
+                    line = words[n] + ' ';
+                    lineNumber++;
+                } else {
+                    line = testLine;
+                }
+            }
+            context.fillText(line, x, y + lineNumber * lineHeight);
+        }
+
+        function changeFontFamily(font) {
+            currentFont = font;
+            document.querySelectorAll('.font-option').forEach(el => el.classList.remove('selected'));
+            event.target.classList.add('selected');
             updateCanvas();
         }
 
-        function switchTab(e,t){document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById(t).classList.add('active');e.target.classList.add('active');}
+        function loadBackgroundImage() {
+            const file = document.getElementById('bgImage').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        backgroundImage = img;
+                        updateCanvas();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
 
-        function downloadImage(){const l=document.createElement('a');l.href=canvas.toDataURL('image/png');l.download=`design-${Date.now()}.png`;l.click();msg('Exported successfully ✅');}
+        function applyEffect(effect) {
+            if (activeEffects.includes(effect)) {
+                activeEffects = activeEffects.filter(e => e !== effect);
+            } else {
+                activeEffects.push(effect);
+            }
+            updateEffectsList();
+            updateCanvas();
+        }
 
-        function msg(m){const s=document.getElementById('status');s.textContent=m;s.classList.add('show');setTimeout(()=>s.classList.remove('show'),3000);}
+        function updateEffectsList() {
+            const list = document.getElementById('effectsList');
+            if (activeEffects.length === 0) {
+                list.textContent = 'کوئی اثر منتخب نہیں';
+            } else {
+                list.textContent = activeEffects.map(e => {
+                    const labels = {
+                        'bold': '🔤 Bold',
+                        'italic': '𝘐 Italic',
+                        'outline': '⊕ Outline',
+                        'shadow': '⬡ Shadow',
+                        'neon': '💫 Neon',
+                        '3d': '3️⃣ 3D'
+                    };
+                    return labels[e];
+                }).join(', ');
+            }
+        }
 
-        document.getElementById('size').addEventListener('input',e=>{document.getElementById('sizeVal').textContent=e.target.value;updateCanvas();});
-        document.getElementById('imgop').addEventListener('input',e=>{document.getElementById('imgopVal').textContent=Math.round(e.target.value*100)+'%';updateCanvas();});
-        document.getElementById('bright').addEventListener('input',e=>{document.getElementById('brightVal').textContent=e.target.value+'%';updateCanvas();});
-        document.getElementById('contrast').addEventListener('input',e=>{document.getElementById('contrastVal').textContent=e.target.value+'%';updateCanvas();});
-        document.getElementById('sat').addEventListener('input',e=>{document.getElementById('satVal').textContent=e.target.value+'%';updateCanvas();});
-        document.getElementById('blur').addEventListener('input',e=>{document.getElementById('blurVal').textContent=e.target.value+'px';updateCanvas();});
+        function addShape(shape) {
+            showStatus(`${shape} شامل کیا گیا | ${shape} added to canvas`);
+        }
 
-        initTemplates();
-        initEmojis();
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = `social-post-${Date.now()}.png`;
+            link.click();
+            showStatus('تصویر ڈاؤن لوڈ ہو رہی ہے | Image downloading... ✅');
+        }
+
+        function resetDesign() {
+            document.getElementById('titleInput').value = 'Your Amazing Title';
+            document.getElementById('descInput').value = 'Add your description here for more impact and engagement!';
+            document.getElementById('titleSize').value = '48';
+            document.getElementById('descSize').value = '20';
+            document.getElementById('titleColor').value = '#ffffff';
+            document.getElementById('descColor').value = '#ffffff';
+            document.getElementById('bgColor').value = '#667eea';
+            document.getElementById('gradientType').value = 'none';
+            document.getElementById('brightness').value = '100';
+            document.getElementById('contrast').value = '100';
+            document.getElementById('saturation').value = '100';
+            activeEffects = [];
+            updateEffectsList();
+            updateCanvas();
+            showStatus('ڈیزائن دوبارہ شروع کر دیا گیا | Design reset! 🔄');
+        }
+
+        function showStatus(message) {
+            const statusBar = document.getElementById('statusBar');
+            statusBar.textContent = message;
+            setTimeout(() => {
+                statusBar.textContent = 'تیار ہے | Ready to create amazing posts! 🎨';
+            }, 3000);
+        }
+
+        function changeOpacity(color, opacity) {
+            const r = parseInt(color.slice(1, 3), 16);
+            const g = parseInt(color.slice(3, 5), 16);
+            const b = parseInt(color.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+        }
+
+        // Update slider displays
+        document.getElementById('titleSize').addEventListener('input', (e) => {
+            document.getElementById('titleSizeValue').textContent = e.target.value;
+        });
+        document.getElementById('descSize').addEventListener('input', (e) => {
+            document.getElementById('descSizeValue').textContent = e.target.value;
+        });
+        document.getElementById('brightness').addEventListener('input', (e) => {
+            document.getElementById('brightnessValue').textContent = e.target.value;
+        });
+        document.getElementById('contrast').addEventListener('input', (e) => {
+            document.getElementById('contrastValue').textContent = e.target.value;
+        });
+        document.getElementById('saturation').addEventListener('input', (e) => {
+            document.getElementById('saturationValue').textContent = e.target.value;
+        });
+
+        // Initialize
         updateCanvas();
     </script>
 </body>
