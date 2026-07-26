@@ -1,0 +1,6 @@
+{
+  "name": "AI Photo Studio & Object Editor",
+  "description": "An AI-powered image editing studio to modify objects, swap backgrounds, apply professional filters, manage synced cloud history, and share creations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
